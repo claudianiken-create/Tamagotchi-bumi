@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tamagotchi Bumi: Sembuhkan Demam Bumi</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Trebuchet MS","Comic Sans MS",Arial,sans-serif;min-height:100vh;background:linear-gradient(180deg,#8edcff,#e1f8d7);color:#24452d}
+button{font-family:inherit;cursor:pointer;border:0}
+.wrap{max-width:1100px;margin:auto;padding:16px}
+header{background:#fff;border-radius:24px;padding:14px;text-align:center;box-shadow:0 6px 15px #0002;margin-bottom:12px}
+header h1{color:#138a48;font-size:clamp(25px,5vw,42px)}
+header p{font-size:18px}
+.status{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:10px}
+.card{background:#fff;padding:9px 18px;border-radius:18px;font-weight:bold;box-shadow:0 4px 10px #0002}
+.main{display:flex;align-items:center;justify-content:center;gap:25px;background:#ffffffc9;border-radius:28px;padding:22px;min-height:350px}
+.earthbox{text-align:center;flex:1}.earthwrap{width:min(280px,65vw);height:min(280px,65vw);margin:auto;position:relative}
+.earth{width:100%;height:100%;border-radius:50%;position:relative;transition:.7s;border:9px solid #b92e2e;background:linear-gradient(145deg,#ff9678,#ef5350);box-shadow:inset -20px -20px 30px #0002,0 10px 25px #0003}
+.land{position:absolute;background:#999;border-radius:50%;transition:.7s}.l1{width:95px;height:65px;left:30px;top:50px;transform:rotate(-25deg)}.l2{width:85px;height:60px;right:25px;top:90px;transform:rotate(30deg)}.l3{width:110px;height:65px;left:75px;bottom:25px}
+.eye{position:absolute;width:23px;height:29px;background:#173d49;border-radius:50%;top:105px;z-index:3}.left{left:78px}.right{right:78px}
+.mouth{position:absolute;width:72px;height:34px;border-bottom:7px solid #173d49;border-radius:0 0 50px 50px;left:50%;transform:translateX(-50%);top:150px;z-index:3;transition:.6s}
+.cheek{position:absolute;width:30px;height:16px;border-radius:50%;background:#ff9c9c;top:148px;opacity:0}.cheek.left{left:43px}.cheek.right{right:43px}
+.sweat{position:absolute;font-size:34px;opacity:0;z-index:5;animation:sweat 1.2s infinite}.s1{right:25px;top:55px}.s2{left:25px;top:70px}
+.crown{position:absolute;top:-42px;left:50%;transform:translateX(-50%);font-size:60px;opacity:0;z-index:10;transition:.7s}
+.hot{animation:weak 1.7s infinite}.hot .mouth{border-bottom:0;border-top:7px solid #173d49;border-radius:50% 50% 0 0;top:170px}.hot .cheek,.hot .sweat{opacity:1}
+.medium{background:linear-gradient(145deg,#83d9ec,#4db6d6);border-color:#388ba8}.medium .land{background:#6caf67}.medium .mouth{width:54px;height:20px;border-bottom-width:5px}
+.healthy{background:linear-gradient(145deg,#70dc62,#27ae60);border-color:#188647;box-shadow:inset -20px -20px 30px #0002,0 0 35px #47c95d99}.healthy .land{background:#2f8f46}.healthy .mouth{width:88px;height:48px;border-bottom:9px solid #173d49}.healthy .crown{opacity:1}
+@keyframes weak{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}@keyframes sweat{0%,100%{transform:translateY(0)}50%{transform:translateY(12px)}}
+.earthstatus{font-size:22px;font-weight:bold;margin-top:12px}
+.thermo{text-align:center;width:90px}.thermobody{height:210px;width:40px;border:5px solid #555;background:#fff;border-radius:24px;margin:auto;overflow:hidden;position:relative}.fill{position:absolute;bottom:0;width:100%;height:100%;background:linear-gradient(#ff9800,#e53935);transition:.8s}.bulb{width:60px;height:60px;background:#e53935;border:5px solid #555;border-radius:50%;margin:-4px auto 8px}.temp{font-size:30px;font-weight:bold;color:#d62828}
+.progress{background:#fff;border-radius:18px;padding:12px;margin:12px auto;max-width:900px}.track{height:18px;background:#ddd;border-radius:20px;overflow:hidden}.pfill{height:100%;width:0;background:linear-gradient(90deg,#ff9800,#4caf50);transition:.7s}
+h2.section{text-align:center;margin:18px 0 9px;font-size:24px}.games,.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;max-width:900px;margin:auto}.btn{min-height:110px;border-radius:23px;color:white;font-weight:bold;font-size:18px;padding:12px;box-shadow:0 6px #0002;transition:.2s}.btn:hover{transform:translateY(-3px)}.btn:disabled{opacity:.5;cursor:not-allowed}.sunbtn{background:#f39c12}.recbtn{background:#27ae60}.energybtn{background:#2980b9}.tree{background:#27ae60}.light{background:#f39c12}.bike{background:#2980b9}.icon{display:block;font-size:40px}
+.modal,.win{position:fixed;inset:0;background:#0009;display:none;justify-content:center;align-items:center;padding:15px;z-index:100}.modal.show,.win.show{display:flex}.box{background:white;width:100%;max-width:720px;max-height:92vh;overflow:auto;border-radius:28px;padding:22px;text-align:center;box-shadow:0 15px 40px #0005}.box h2{color:#138a48;margin-bottom:8px;font-size:29px}.close{background:#e74c3c;color:#fff;padding:10px 20px;border-radius:14px;margin-top:14px}
+.sunarea{height:380px;border-radius:18px;position:relative;overflow:hidden;background:linear-gradient(#72d7ff,#dff9ff);border:4px solid #5aaac8;cursor:crosshair}.sunarea:after{content:"🌳 🌳 🌳 🌳 🌳";position:absolute;bottom:0;left:0;width:100%;height:60px;background:#67c45a;font-size:35px;padding:8px}.sunobj{position:absolute;font-size:34px;z-index:2;animation:float 1s infinite alternate}.factory{position:absolute;font-size:45px}.sunscore{font-size:21px;font-weight:bold;margin-bottom:8px}@keyframes float{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+.recycle{background:#ecf8e9;border-radius:18px;padding:14px}.wastes{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:15px}.waste{width:78px;height:78px;background:#fff;border:4px solid #ccc;border-radius:17px;display:flex;align-items:center;justify-content:center;font-size:38px;cursor:grab;touch-action:none;user-select:none}.waste.selected{border-color:#27ae60;transform:scale(1.08);box-shadow:0 0 0 5px #b7efb1}.bin{transition:transform .15s,box-shadow .15s}.bin.target{transform:scale(1.04);box-shadow:0 0 0 5px #fff59d}.bins{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.bin{min-height:120px;border-radius:18px;color:#fff;display:flex;flex-direction:column;justify-content:center;align-items:center;font-weight:bold;font-size:17px}.paper{background:#3498db}.plastic{background:#f39c12}.organic{background:#27ae60}.plant{display:none;margin-top:12px}.plant.show{display:block}.plant button{background:#27ae60;color:#fff;border-radius:15px;padding:12px 22px;font-size:19px;font-weight:bold}.seed{font-size:55px}
+.room{background:linear-gradient(#edf7ff,#fff);border:4px solid #9bb9ce;border-radius:18px;padding:16px}.timer{font-size:28px;font-weight:bold;color:#e74c3c}.electronics{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:480px;margin:18px auto}.device{font-size:42px;background:#f7f7f7;border:3px solid #ddd;border-radius:18px;padding:10px}.switch{width:70px;height:38px;border-radius:22px;background:#e74c3c;margin:8px auto;position:relative}.switch:after{content:"";position:absolute;width:28px;height:28px;background:#fff;border-radius:50%;left:5px;top:5px;transition:.25s}.switch.off{background:#27ae60}.switch.off:after{left:37px}
+.qtext{font-size:21px;line-height:1.5;margin:14px 0}.speak{background:#9b59b6;color:#fff;padding:11px 18px;border-radius:14px;font-size:17px}.answers{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}.answer{min-height:75px;border-radius:18px;background:#e8f7ff;border:4px solid #69c8ed;color:#1769aa;font-size:28px;font-weight:bold}.feedback{min-height:45px;margin-top:12px;font-size:21px;font-weight:bold}.correct{color:#169447}.wrong{color:#e67e22}
+.win{background:linear-gradient(135deg,#5ddf72,#65c8ff);z-index:200}.certificate{background:#fffdf1;border:9px double #e3ad24;border-radius:25px;padding:28px;max-width:680px;text-align:center}.certificate .trophy{font-size:62px}.certificate h1{color:#169447;font-size:44px}.certificate h2{color:#d28c00;margin:12px}.certificate p{font-size:19px;line-height:1.5}.again{background:#169447;color:#fff;padding:14px 30px;border-radius:18px;font-size:21px;font-weight:bold;margin-top:15px}
+.spark{position:fixed;pointer-events:none;font-size:28px;z-index:500;animation:sp 1.2s forwards}@keyframes sp{to{opacity:0;transform:translateY(-110px) scale(1.5)}}
+@media(max-width:700px){.main{flex-direction:column}.games,.actions{grid-template-columns:1fr}.thermo{display:flex;align-items:center;justify-content:center;gap:10px;width:100%}.thermobody{height:130px}.bulb{width:50px;height:50px}.answers,.bins{grid-template-columns:1fr}.sunarea{height:320px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header><h1>🌍 Tamagotchi Bumi</h1><p>💚 Sembuhkan Demam Bumi!</p></header>
+
+<div class="status">
+<div class="card">🌡️ Suhu: <span id="tempTop">38</span>°C</div>
+<div class="card">⭐ Bintang: <span id="score">0</span></div>
+</div>
+
+<section class="main">
+<div class="earthbox">
+<div class="earthwrap">
+<div class="crown">🌿👑🌿</div>
+<div id="earth" class="earth hot">
+<div class="land l1"></div><div class="land l2"></div><div class="land l3"></div>
+<div class="eye left"></div><div class="eye right"></div>
+<div class="cheek left"></div><div class="cheek right"></div>
+<div class="mouth"></div><div class="sweat s1">💧</div><div class="sweat s2">💧</div>
+</div></div>
+<div id="earthStatus" class="earthstatus">🥵 Bumi sedang demam! Ayo bantu Bumi!</div>
+</div>
+<div class="thermo"><div><div class="thermobody"><div id="fill" class="fill"></div></div><div class="bulb"></div></div><div class="temp"><span id="temp">38</span>°C</div></div>
+</section>
+
+<div class="progress"><b>🌱 Perjalanan Menyehatkan Bumi</b><div class="track"><div id="pfill" class="pfill"></div></div></div>
+
+<h2 class="section">🎮 3 Misi untuk Menolong Bumi</h2>
+<section class="games">
+<button id="sunBtn" class="btn sunbtn" onclick="openSun()"><span class="icon">☀️</span>Tangkap Sinar Surya<br><small>Tangkap energi bersih!</small></button>
+<button id="recBtn" class="btn recbtn" onclick="openRecycle()"><span class="icon">♻️</span>Pilah Sampah & Reboisasi<br><small>Pilah lalu tanam pohon!</small></button>
+<button id="energyBtn" class="btn energybtn" onclick="openEnergy()"><span class="icon">💡</span>Hemat Energi<br><small>Matikan sebelum waktu habis!</small></button>
+</section>
+
+<h2 class="section">🔢 Tantangan Numerasi Bumi</h2>
+<section class="actions">
+<button class="btn tree" onclick="question('tree')"><span class="icon">🌲</span>Tanam Pohon</button>
+<button class="btn light" onclick="question('light')"><span class="icon">💡</span>Matikan Lampu</button>
+<button class="btn bike" onclick="question('bike')"><span class="icon">🚲</span>Naik Sepeda</button>
+</section>
+</div>
+
+<!-- MINI GAME MODAL -->
+<div id="miniModal" class="modal"><div class="box">
+<h2 id="miniTitle">🎮 Mini-Game</h2><p id="miniDesc"></p>
+
+<div id="sunContainer" style="display:none">
+<div class="sunscore">☀️ Energi Bersih: <span id="sunScore">0</span>/5</div>
+<div id="sunArea" class="sunarea"></div>
+</div>
+
+<div id="recContainer" style="display:none">
+<div class="recycle">
+<p>Seret setiap sampah ke tempat yang tepat!</p>
+<div id="wastes" class="wastes">
+<div class="waste" draggable="true" data-type="paper">📄</div>
+<div class="waste" draggable="true" data-type="plastic">🥤</div>
+<div class="waste" draggable="true" data-type="organic">🍎</div>
+<div class="waste" draggable="true" data-type="paper">📰</div>
+</div>
+<div class="bins">
+<div class="bin paper" data-type="paper">📘<span>Kertas</span></div>
+<div class="bin plastic" data-type="plastic">🥤<span>Plastik</span></div>
+<div class="bin organic" data-type="organic">🍃<span>Organik</span></div>
+</div>
+<div id="plant" class="plant"><div>Semua sampah sudah dipilah! 🎉</div><div class="seed">🌱</div><button onclick="plantTree()">🌳 Tanam Pohon</button></div>
+</div></div>
+
+<div id="energyContainer" style="display:none">
+<div class="room">
+<div class="timer">⏱️ <span id="timer">15</span> detik</div>
+<div class="electronics">
+<div class="device">💡<div class="switch"></div></div>
+<div class="device">📺<div class="switch"></div></div>
+<div class="device">💻<div class="switch"></div></div>
+<div class="device">🌀<div class="switch"></div></div>
+</div>
+<div id="energyMsg"><b>Matikan semua alat yang tidak dipakai!</b></div>
+</div>
+</div>
+<button class="close" onclick="closeMini()">✖ Tutup</button>
+</div></div>
+
+<!-- QUESTION MODAL -->
+<div id="qModal" class="modal"><div class="box">
+<h2 id="qTitle">🌱 Ayo Berhitung!</h2>
+<div id="qText" class="qtext"></div>
+<button class="speak" onclick="speakQuestion()">🔊 Dengarkan Soal</button>
+<div id="answers" class="answers"></div>
+<div id="feedback" class="feedback"></div>
+</div></div>
+
+<!-- WIN -->
+<div id="win" class="win"><div class="certificate">
+<div class="trophy">🏆🌍</div><h1>SELAMAT!</h1><h2>🌱 PAHLAWAN BUMI 🌱</h2>
+<p>Hebat sekali! Kamu berhasil membantu Bumi menjadi lebih sehat.</p>
+<p>🌡️ Suhu Bumi sekarang: <strong>26°C</strong></p>
+<p>☀️ Energi bersih • ♻️ Pilah sampah • 🌳 Reboisasi • 💡 Hemat energi • 🔢 Numerasi</p>
+<p>💚 Terima kasih sudah menjadi <strong>Pahlawan Bumi!</strong></p>
+<button class="again" onclick="restart()">🔄 Main Lagi</button>
+</div></div>
+
+<script>
+let temp=38,score=0,finished=false;
+let done={sun:false,recycle:false,energy:false};
+let current=null,energyInterval=null,energyTime=15;
+
+const $=id=>document.getElementById(id);
+
+function update(){
+ $("temp").textContent=temp;$("tempTop").textContent=temp;
+ let e=$("earth");e.classList.remove("hot","medium","healthy");
+ if(temp>=34){e.classList.add("hot");$("earthStatus").textContent="🥵 Bumi sedang demam! Ayo bantu Bumi!"}
+ else if(temp>=30){e.classList.add("medium");$("earthStatus").textContent="😟 Bumi mulai membaik! Teruskan!"}
+ else{e.classList.add("healthy");$("earthStatus").textContent="😄 Bumi sehat, hijau, dan bahagia! 🌿"}
+ let pct=((temp-26)/12)*100;$("fill").style.height=Math.max(0,Math.min(100,pct))+"%";
+ $("fill").style.background=temp>=34?"linear-gradient(#ff9800,#e53935)":temp>=30?"linear-gradient(#ffeb3b,#ff9800)":"linear-gradient(#8bc34a,#27ae60)";
+ $("pfill").style.width=((38-temp)/12*100)+"%";
+}
+function lower(n){temp=Math.max(26,temp-n);update();sparkles();if(temp===26)finish()}
+function sparkles(){["⭐","✨","🌱","💚","🌍"].forEach((s,i)=>{for(let j=0;j<4;j++){let x=document.createElement("div");x.className="spark";x.textContent=s;x.style.left=Math.random()*100+"vw";x.style.top=Math.random()*80+"vh";document.body.appendChild(x);setTimeout(()=>x.remove(),1200)}})}
+function speak(t){if(!("speechSynthesis"in window))return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="id-ID";u.rate=.85;u.pitch=1.1;speechSynthesis.speak(u)}
+function hideMini(){$("sunContainer").style.display="none";$("recContainer").style.display="none";$("energyContainer").style.display="none"}
+function openMini(title,desc){$("miniModal").classList.add("show");$("miniTitle").textContent=title;$("miniDesc").textContent=desc;hideMini()}
+function closeMini(){clearInterval(energyInterval);$("miniModal").classList.remove("show");update()}
+
+/* SUN GAME */
+let sunScore=0;
+function openSun(){if(done.sun)return;openMini("☀️ Tangkap Sinar Surya","Klik 5 sinar surya ☀️ dan hindari asap pabrik 💨!");$("sunContainer").style.display="block";startSun()}
+function startSun(){sunScore=0;$("sunScore").textContent=0;let a=$("sunArea");a.innerHTML="<div style='position:absolute;font-size:55px;left:15px;top:12px'>☀️</div>";for(let i=0;i<5;i++){let x=document.createElement("div");x.className="sunobj";x.textContent="🔆";x.style.left=10+Math.random()*78+"%";x.style.top=10+Math.random()*68+"%";x.onclick=()=>{x.remove();sunScore++;$("sunScore").textContent=sunScore;sparkles();if(sunScore===5)setTimeout(completeSun,400)};a.appendChild(x)}for(let i=0;i<3;i++){let f=document.createElement("div");f.className="factory";f.textContent="🏭💨";f.style.left=20+Math.random()*65+"%";f.style.top=25+Math.random()*50+"%";a.appendChild(f)}}
+function completeSun(){done.sun=true;$("sunBtn").disabled=true;score+=2;$("score").textContent=score;lower(2);$("miniDesc").textContent="🎉 Hebat! Energi bersih berhasil ditangkap. Suhu turun 2°C!";speak("Hebat! Kamu berhasil menangkap energi bersih. Suhu Bumi turun dua derajat.");setTimeout(closeMini,1700)}
+
+/* RECYCLE */
+let recycleCorrect=0,dragged=null,selectedWaste=null;
+function openRecycle(){if(done.recycle)return;openMini("♻️ Pilah Sampah & Reboisasi","Seret sampah ke tempat yang sesuai. Jika memakai HP/iPad, cukup ketuk sampah lalu ketuk tempatnya!");$("recContainer").style.display="block";recycleCorrect=0;selectedWaste=null;$("plant").classList.remove("show");setupRecycle()}
+function finishSort(w,b){
+ if(!w||!b||!document.body.contains(w))return;
+ if(w.dataset.type!==b.dataset.type){speak("Coba lagi. Sampah itu masuk ke tempat yang berbeda.");b.animate([{transform:"translateX(-5px)"},{transform:"translateX(5px)"},{transform:"translateX(0)"}],{duration:220});return;}
+ w.remove(); selectedWaste=null; recycleCorrect++; score++; $("score").textContent=score; sparkles();
+ if(recycleCorrect===4){$("plant").classList.add("show");speak("Semua sampah sudah dipilah. Sekarang tanam pohon!");} else {speak("Benar! Sampah masuk ke tempat yang tepat.");}
+}
+function setupRecycle(){
+ const wastes=[...document.querySelectorAll(".waste")];
+ const bins=[...document.querySelectorAll(".bin")];
+ wastes.forEach(w=>{
+   w.onclick=()=>{
+     if(selectedWaste===w){w.classList.remove("selected");selectedWaste=null;return;}
+     wastes.forEach(x=>x.classList.remove("selected")); w.classList.add("selected"); selectedWaste=w;
+     speak("Sekarang pilih tempat sampah yang sesuai.");
+   };
+   w.ondragstart=e=>{dragged=w;selectedWaste=w;e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",w.dataset.type);w.classList.add("selected");};
+   w.ondragend=()=>{w.classList.remove("selected");dragged=null;};
+   w.onpointerdown=e=>{if(e.pointerType!=="mouse")w.classList.add("selected");};
+ });
+ bins.forEach(b=>{
+   b.onclick=()=>{ if(selectedWaste) finishSort(selectedWaste,b); };
+   b.ondragover=e=>{e.preventDefault();b.classList.add("target");if(e.dataTransfer)e.dataTransfer.dropEffect="move";};
+   b.ondragleave=()=>b.classList.remove("target");
+   b.ondrop=e=>{e.preventDefault();b.classList.remove("target");let w=dragged||selectedWaste;finishSort(w,b);dragged=null;};
+ });
+}
+function plantTree(){done.recycle=true;$("recBtn").disabled=true;score+=2;$("score").textContent=score;lower(2);$("plant").innerHTML="<div style='font-size:50px'>🌳🌳🌳</div><b>Hebat! Pohon berhasil ditanam!</b>";speak("Hebat! Kamu berhasil memilah sampah dan menanam pohon. Suhu turun dua derajat.");setTimeout(closeMini,1700)}
+
+/* ENERGY */
+function openEnergy(){if(done.energy)return;openMini("💡 Hemat Energi","Matikan semua alat elektronik sebelum waktu habis!");$("energyContainer").style.display="block";startEnergy()}
+function startEnergy(){clearInterval(energyInterval);energyTime=15;$("timer").textContent=energyTime;$("energyMsg").innerHTML="<b>Matikan semua alat yang tidak dipakai!</b>";let switches=[...document.querySelectorAll(".switch")];switches.forEach(s=>{s.classList.remove("off");s.dataset.off="false";s.onclick=()=>{if(s.dataset.off==="true")return;s.dataset.off="true";s.classList.add("off");sparkles();if(switches.every(x=>x.dataset.off==="true"))completeEnergy()}});energyInterval=setInterval(()=>{energyTime--;$("timer").textContent=energyTime;if(energyTime<=0){clearInterval(energyInterval);if(!switches.every(x=>x.dataset.off==="true")){$("energyMsg").textContent="⏰ Waktu habis! Coba lagi ya!";speak("Waktu habis. Yuk coba lagi!");setTimeout(startEnergy,1200)}}},1000)}
+function completeEnergy(){clearInterval(energyInterval);done.energy=true;$("energyBtn").disabled=true;score+=2;$("score").textContent=score;lower(2);$("energyMsg").textContent="🎉 Semua alat sudah dimatikan!";speak("Hebat! Kamu berhasil menghemat energi. Suhu turun dua derajat.");setTimeout(closeMini,1700)}
+
+/* NUMERACY */
+const qs={
+tree:[["🌲 Tanam Pohon!",3,t=>`${t}°C - 3°C = ...`],["🌳 Dua Pohon!",4,t=>`${t}°C - (2 × 2°C) = ...`]],
+light:[["💡 Matikan Lampu!",2,t=>`${t}°C - 2°C = ...`],["💡 Hemat Energi!",4,t=>`${t}°C - (2 × 2°C) = ...`]],
+bike:[["🚲 Naik Sepeda!",3,t=>`${t}°C - 3°C = ...`],["🚲 Gowes Bersama!",2,t=>`${t}°C - 2°C = ...`]]
+};
+function question(type){let q=qs[type][Math.floor(Math.random()*qs[type].length)],r=Math.min(q[1],temp-26);current={title:q[0],reduction:r,answer:temp-r,text:q[2](temp)};$("qTitle").textContent=current.title;$("qText").innerHTML=`Suhu Bumi sekarang <b>${temp}°C</b>.<br>${current.text}`;$("feedback").textContent="";let a=new Set([current.answer]);while(a.size<3){let w=current.answer+Math.floor(Math.random()*7)-3;if(w!==current.answer&&w>=20&&w<=40)a.add(w)}$("answers").innerHTML="";[...a].sort(()=>Math.random()-.5).forEach(v=>{let b=document.createElement("button");b.className="answer";b.textContent=v+"°C";b.onclick=()=>check(v);$("answers").appendChild(b)});$("qModal").classList.add("show");setTimeout(speakQuestion,350)}
+function speakQuestion(){speak(`Suhu Bumi sekarang ${temp} derajat Celsius. ${current.text.replace("°C"," derajat Celsius")}`)}
+function check(v){if(v===current.answer){$("feedback").className="feedback correct";$("feedback").textContent="🎉 Hebat! Bumi makin sejuk!";score++;$("score").textContent=score;document.querySelectorAll(".answer").forEach(b=>b.disabled=true);lower(current.reduction);setTimeout(()=>$("qModal").classList.remove("show"),800)}else{$("feedback").className="feedback wrong";$("feedback").textContent="😊 Yuk coba hitung lagi bersama-sama!";speak("Yuk coba hitung lagi bersama-sama.")}}
+function finish(){if(finished)return;finished=true;setTimeout(()=>{$("win").classList.add("show");speak("Selamat! Kamu berhasil menyembuhkan demam Bumi. Kamu adalah Pahlawan Bumi!")},900)}
+function restart(){temp=38;score=0;finished=false;done={sun:false,recycle:false,energy:false};$("score").textContent=0;["sunBtn","recBtn","energyBtn"].forEach(id=>$(id).disabled=false);$("win").classList.remove("show");update();speak("Ayo mulai lagi! Mari kita bantu Bumi menjadi sehat.")}
+update();
+</script>
+</body>
+</html>
